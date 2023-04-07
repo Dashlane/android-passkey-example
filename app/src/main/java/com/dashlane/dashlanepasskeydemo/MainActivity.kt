@@ -100,8 +100,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openSourceCodeWebPage() {
-        // TODO : Replace with a real link to the source code
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.github.com"))
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Dashlane/android-passkey-example"))
         startActivity(browserIntent)
     }
 }
