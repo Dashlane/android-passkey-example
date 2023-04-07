@@ -5,7 +5,7 @@
 ![Licence](showcase.gif)
 
 The purpose of this demo application is to showcase the implementation of passkeys in a native Android application. It also serves
-as an example for developers who want to incorporate passkey authentication in their own app. This code application requires
+as an example for developers who want to incorporate passkey authentication in their own app. This application requires
 Android 14 or higher.
 
 ## What is a passkey?
