@@ -62,14 +62,14 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.0'
     implementation "androidx.compose.material3:material3:1.0.1"
-    implementation "androidx.compose.ui:ui:1.4.0"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.4.0"
+    implementation "androidx.compose.ui:ui:1.4.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.4.1"
     implementation 'androidx.activity:activity-compose:1.7.0'
     implementation 'androidx.navigation:navigation-compose:2.5.3'
 
     // Credentials manager
-    implementation "androidx.credentials:credentials:1.2.0-alpha02"
-    implementation "androidx.credentials:credentials-play-services-auth:1.2.0-alpha02"
+    implementation "androidx.credentials:credentials:1.2.0-alpha03"
+    implementation "androidx.credentials:credentials-play-services-auth:1.2.0-alpha03"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:2.44"
