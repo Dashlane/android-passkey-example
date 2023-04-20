@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.bouncycastle.asn1.ASN1Integer
+import org.bouncycastle.asn1.ASN1Sequence
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util
 import org.bouncycastle.jce.ECNamedCurveTable
 import java.math.BigInteger
@@ -145,7 +147,7 @@ class LoginViewModel @Inject constructor(
      * Check if the signature is valid by signing the clientDataJSON with the public key
      */
     private fun verifySignature(responseData: GetPasskeyResponseData, publicKey: PublicKey): Boolean {
-        val signature = responseData.response.signature.b64Decode()
+        val signature = asn1decodeSignature(responseData.response.signature.b64Decode())
         val sig = Signature.getInstance("SHA256withECDSA")
         sig.initVerify(publicKey)
         val md = MessageDigest.getInstance("SHA-256")
@@ -153,6 +155,23 @@ class LoginViewModel @Inject constructor(
         val signatureBase = responseData.response.authenticatorData.b64Decode() + clientDataHash
         sig.update(signatureBase)
         return sig.verify(signature)
+    }
+
+    /**
+     * Convert the signature from ASN.1 to raw format. Every ECDSA-based algorithms, the signature value MUST
+     * be encoded as an ASN.1 DER. As We are only supporting ES256 algorithm, the signature must be ASN.1 encoded.
+     */
+    private fun asn1decodeSignature(encoded: ByteArray): ByteArray {
+        val sequence = ASN1Sequence.getInstance(encoded) ?: throw IllegalArgumentException("Input is not a valid ASN.1 encoded signature")
+        if (sequence.size() != 2) {
+            throw IllegalArgumentException("Input is not a valid ASN.1 encoded signature")
+        }
+        val s1 = ASN1Integer.getInstance(sequence.getObjectAt(0)).value.toByteArray()
+        val s2 = ASN1Integer.getInstance(sequence.getObjectAt(1)).value.toByteArray()
+        val signature = ByteArray(s1.size + s2.size)
+        s1.copyInto(signature)
+        s2.copyInto(signature, s1.size)
+        return signature
     }
 
     /**
