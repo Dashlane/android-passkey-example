@@ -12,6 +12,6 @@ data class CreatePasskeyResponseData(
     data class Response(
         @SerializedName("clientDataJSON") val clientDataJSON: String,
         @SerializedName("attestationObject") val attestationObject: String,
-        @SerializedName("transports") val transports: List<List<String>>
+        @SerializedName("transports") val transports: List<String>
     )
 }

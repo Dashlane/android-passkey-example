@@ -2,6 +2,8 @@ package com.dashlane.dashlanepasskeydemo.repository
 
 import android.content.SharedPreferences
 import com.dashlane.dashlanepasskeydemo.b64Encode
+import com.dashlane.dashlanepasskeydemo.model.CreatePasskeyRequest
+import com.dashlane.dashlanepasskeydemo.model.GetPasskeyRequest
 import com.dashlane.dashlanepasskeydemo.model.UserData
 import com.google.gson.Gson
 import java.security.SecureRandom
@@ -54,42 +56,56 @@ class AccountRepositoryLocal @Inject constructor(
      * Create the request to create a passkey. From https://w3c.github.io/webauthn/#sctn-sample-registration
      */
     override fun getCreatePasskeyRequest(userId: String, email: String): String {
-        return "{\n" +
-                "  \"challenge\":\"${generateFidoChallenge()}\",\n" +
-                "  \"rp\":{\n" +
-                "    \"name\":\"Dashlane Passkey Demo\",\n" +
-                "    \"id\":\"$RELYING_PARTY_ID\"\n" +
-                "  },\n" +
-                "  \"user\":{\n" +
-                "    \"id\":\"$userId\",\n" +
-                "    \"name\":\"$email\",\n" +
-                "    \"displayName\":\"$email\"\n" +
-                "  },\n" +
-                "  \"pubKeyCredParams\":[\n" +
-                "    {\"type\":\"public-key\",\"alg\":-7}],\n" +
-                "  \"timeout\":1800000,\n" +
-                "  \"attestation\":\"none\",\n" +
-                "  \"excludeCredentials\":[],\n" +
-                "  \"authenticatorSelection\":{\n" +
-                "    \"authenticatorAttachment\":\"platform\",\n" +
-                "    \"requireResidentKey\":true,\n" +
-                "    \"residentKey\": \"required\",\n" +
-                "    \"userVerification\":\"required\"\n" +
-                "  }\n" +
-                "}"
+        return gson.toJson(
+            CreatePasskeyRequest(
+                challenge = generateFidoChallenge(),
+                rp = CreatePasskeyRequest.Rp(
+                    name = "Dashlane Passkey Demo",
+                    id = RELYING_PARTY_ID
+                ),
+                user = CreatePasskeyRequest.User(
+                    id = userId,
+                    name = email,
+                    displayName = email
+                ),
+                pubKeyCredParams = listOf(
+                    CreatePasskeyRequest.PubKeyCredParams(
+                        type = "public-key",
+                        alg = -7
+                    )
+                ),
+                timeout = 1800000,
+                attestation = "none",
+                excludeCredentials = emptyList(),
+                authenticatorSelection = CreatePasskeyRequest.AuthenticatorSelection(
+                    authenticatorAttachment = "platform",
+                    requireResidentKey = false,
+                    residentKey = "required",
+                    userVerification = "required"
+                )
+            )
+        )
     }
 
     /**
      * Create the request to login with a passkey. From https://w3c.github.io/webauthn/#sctn-sample-authentication
      */
     override fun getLoginPasskeyRequest(allowedCredential: List<String>): String {
-        return "{\n" +
-                "  \"challenge\":\"${generateFidoChallenge()}\",\n" +
-                "  \"allowCredentials\":$allowedCredential,\n" +
-                "  \"timeout\":1800000,\n" +
-                "  \"userVerification\":\"required\",\n" +
-                "  \"rpId\":\"$RELYING_PARTY_ID\"\n" +
-                "}"
+        return gson.toJson(
+            GetPasskeyRequest(
+                challenge = generateFidoChallenge(),
+                timeout = 1800000,
+                userVerification = "required",
+                rpId = RELYING_PARTY_ID,
+                allowCredentials = allowedCredential.map {
+                    GetPasskeyRequest.AllowCredentials(
+                        id = it,
+                        transports = listOf(),
+                        type = "public-key"
+                    )
+                }
+            )
+        )
     }
 
     /**
