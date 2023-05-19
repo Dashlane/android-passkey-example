@@ -81,8 +81,8 @@ class LoginViewModel @Inject constructor(
             val userId = UUID.randomUUID().toString()
             try {
                 val response = credentialManager.createCredential(
+                    activity,
                     CreatePublicKeyCredentialRequest(accountRepository.getCreatePasskeyRequest(userId, email)),
-                    activity
                 )
                 val responseData = gson.fromJson(
                     (response as CreatePublicKeyCredentialResponse).registrationResponseJson,
@@ -138,7 +138,7 @@ class LoginViewModel @Inject constructor(
         option: GetPublicKeyCredentialOption
     ): GetPasskeyResponseData {
         val getCredRequest = GetCredentialRequest(listOf(option))
-        val response = credentialManager.getCredential(getCredRequest, activity)
+        val response = credentialManager.getCredential(activity, getCredRequest)
         val cred = response.credential as PublicKeyCredential
         return gson.fromJson(cred.authenticationResponseJson, GetPasskeyResponseData::class.java)
     }
